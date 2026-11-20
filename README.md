@@ -1,13 +1,6 @@
 # Heph for JetBrains IDEs
 
-Language support for [heph](https://hephbuild.github.io/) BUILD files, powered by the heph
-language server (`heph tool build-lsp`).
-
-- Diagnostics, completion, hover, go to definition and formatting (Reformat Code).
-- A `Heph` file type with syntax highlighting, commenting, brace matching and quote handling.
-- Completion inserts `()` for functions and `name = "",` for string arguments.
-
-Requires IntelliJ IDEA or GoLand 2025.3 or newer.
+[Heph](https://hephbuild.github.io/) support for JetBrains IDEs. Requires IntelliJ IDEA or GoLand 2025.3 or newer.
 
 ## Settings
 
