@@ -1,0 +1,53 @@
+<idea-plugin>
+    <id>io.github.hephbuild.heph</id>
+    <name>Heph</name>
+    <vendor url="https://hephbuild.github.io/">hephbuild</vendor>
+    <!-- https://github.com/hephbuild/heph-jetbrains -->
+
+    <description><![CDATA[
+        Language server integration for <a href="https://hephbuild.github.io/">heph</a> BUILD files.
+        Starts <code>heph tool build-lsp</code> for BUILD files inside a heph repository and provides
+        diagnostics, completion, hover, go to definition and formatting. Adds a "Heph" file type with syntax
+        highlighting, a colour settings page, commenting, brace matching and quote handling.
+        Requires an IDE with native LSP support (IntelliJ IDEA, GoLand and other 2025.3+ IDEs).
+    ]]></description>
+
+    <depends>com.intellij.modules.platform</depends>
+    <depends>com.intellij.modules.lsp</depends>
+
+    <resource-bundle>messages.HephBundle</resource-bundle>
+
+    <extensions defaultExtensionNs="com.intellij">
+        <fileType name="Heph"
+                  implementationClass="io.github.hephbuild.heph.lang.HephFileType"
+                  fieldName="INSTANCE"
+                  language="HephBuild"/>
+        <fileTypeOverrider implementation="io.github.hephbuild.heph.filetype.HephFileTypeOverrider"/>
+        <lang.parserDefinition language="HephBuild"
+                               implementationClass="io.github.hephbuild.heph.lang.parser.HephParserDefinition"/>
+        <lang.syntaxHighlighterFactory language="HephBuild"
+                                       implementationClass="io.github.hephbuild.heph.lang.highlight.HephSyntaxHighlighterFactory"/>
+        <colorSettingsPage implementation="io.github.hephbuild.heph.lang.highlight.HephColorSettingsPage"/>
+        <lang.commenter language="HephBuild" implementationClass="io.github.hephbuild.heph.lang.editor.HephCommenter"/>
+        <lang.braceMatcher language="HephBuild" implementationClass="io.github.hephbuild.heph.lang.editor.HephBraceMatcher"/>
+        <lang.quoteHandler language="HephBuild" implementationClass="io.github.hephbuild.heph.lang.editor.HephQuoteHandler"/>
+        <enterHandlerDelegate implementation="io.github.hephbuild.heph.lang.editor.HephEnterHandler" order="first"/>
+        <typedHandler implementation="io.github.hephbuild.heph.lang.editor.HephClosingBracketHandler"/>
+
+        <platform.lsp.serverSupportProvider
+                implementation="io.github.hephbuild.heph.lsp.HephLspServerSupportProvider"/>
+
+        <applicationConfigurable
+                parentId="language"
+                id="io.github.hephbuild.heph.settings"
+                instance="io.github.hephbuild.heph.settings.HephConfigurable"
+                displayName="Heph"/>
+
+        <notificationGroup id="Heph" displayType="BALLOON" key="notification.group.name"/>
+    </extensions>
+
+    <applicationListeners>
+        <listener class="io.github.hephbuild.heph.filetype.HephConfigFileListener"
+                  topic="com.intellij.openapi.vfs.newvfs.BulkFileListener"/>
+    </applicationListeners>
+</idea-plugin>
