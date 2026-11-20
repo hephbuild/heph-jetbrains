@@ -22,8 +22,8 @@ LSP support, so IDEs without it (Android Studio, IDEA OSS builds, pre-2025.3) ar
 
 Settings | Languages & Frameworks | Heph
 
-- Heph executable: empty means auto-detect (`PATH` from the shell environment, then
-  `~/.local/bin`, `/opt/homebrew/bin`, `/usr/local/bin`).
+- Heph executable: prefilled with the detected location (`PATH` from the shell environment, then
+  `~/.local/bin`, `/opt/homebrew/bin`, `/usr/local/bin`); change it to use another binary.
 - Server arguments: default `tool build-lsp`. `build-lsp` is not a stable public heph API, so this
   stays editable.
 - Additional file names: semicolon separated names or globs for build files that do not match the

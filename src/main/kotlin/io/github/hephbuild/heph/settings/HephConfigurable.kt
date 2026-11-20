@@ -16,10 +16,13 @@ import com.intellij.ui.dsl.builder.panel
 class HephConfigurable : BoundConfigurable(HephBundle.message("settings.title")) {
     override fun createPanel(): DialogPanel {
         val settings = HephSettings.getInstance()
-        val detected = when (val result = HephBinaryResolver().resolve("")) {
-            is HephBinaryResult.Found -> HephBundle.message("settings.binary.detected", result.path)
-            else -> HephBundle.message("settings.binary.notDetected")
-        }
+        // Silent first-run seeding, before the fields are bound, so the page does not open as modified.
+        val detected = (HephBinaryResolver().resolve("") as? HephBinaryResult.Found)?.path?.toString()
+        val seeded = HephSettings.seedBinaryPath(settings.binaryPath, detected)
+        if (seeded != settings.binaryPath) settings.binaryPath = seeded
+        val binaryComment = HephBundle.message(
+            if (seeded.isBlank()) "settings.binary.notDetected" else "settings.binary.comment",
+        )
         return panel {
             row(HephBundle.message("settings.binary")) {
                 textFieldWithBrowseButton(
@@ -28,7 +31,7 @@ class HephConfigurable : BoundConfigurable(HephBundle.message("settings.title"))
                 )
                     .bindText(settings::binaryPath)
                     .align(AlignX.FILL)
-                    .comment("${HephBundle.message("settings.binary.comment")} $detected")
+                    .comment(binaryComment)
             }
             row(HephBundle.message("settings.args")) {
                 textField()

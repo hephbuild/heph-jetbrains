@@ -50,5 +50,9 @@ class HephSettings : SimplePersistentStateComponent<HephSettings.State>(State())
 
     companion object {
         fun getInstance(): HephSettings = service()
+
+        /** First-run value for the binary path field: keep a non-blank [current], else use [detected] if any. */
+        fun seedBinaryPath(current: String, detected: String?): String =
+            if (current.isNotBlank() || detected == null) current else detected
     }
 }
