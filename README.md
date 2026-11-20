@@ -21,6 +21,11 @@ Settings | Languages & Frameworks | Heph
 Files matching these names inside a directory tree containing `.hephconfig` open as `Heph` and
 get the language server. Colours: Settings | Editor | Color Scheme | Heph.
 
+## Debugging
+
+Enable debug logging for `#com.intellij.platform.lsp` and `#io.github.hephbuild.heph`
+(Help | Diagnostic Tools | Debug Log Settings), then check `idea.log`.
+
 ## Development
 
 Requires JDK 21.
