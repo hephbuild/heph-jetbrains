@@ -34,7 +34,7 @@ class HephConfigFileListener : BulkFileListener {
                 is VFileDeleteEvent -> event.file.name == marker
                 is VFileMoveEvent -> event.file.name == marker || directoryHasMarker(event.file)
                 is VFileCopyEvent -> event.newChildName == marker || directoryHasMarker(event.findCreatedFile())
-                is VFilePropertyChangeEvent -> event.isRename && (event.oldValue == marker || event.newValue == marker)
+                is VFilePropertyChangeEvent -> event.propertyName == VirtualFile.PROP_NAME && (event.oldValue == marker || event.newValue == marker)
                 else -> false
             }
         }

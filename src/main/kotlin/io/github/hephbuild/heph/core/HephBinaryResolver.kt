@@ -1,7 +1,6 @@
 package io.github.hephbuild.heph.core
 
 import com.intellij.execution.configurations.PathEnvironmentVariableUtil
-import com.intellij.openapi.util.io.FileUtil
 import java.nio.file.Files
 import java.nio.file.Path
 
@@ -24,7 +23,7 @@ class HephBinaryResolver(
     fun resolve(explicit: String): HephBinaryResult {
         val configured = explicit.trim()
         if (configured.isNotEmpty()) {
-            val path = Path.of(FileUtil.expandUserHome(configured))
+            val path = Path.of(expandHome(configured))
             return when {
                 !exists(path) -> HephBinaryResult.NotFound(configured)
                 !isFile(path) || !isExecutable(path) -> HephBinaryResult.NotExecutable(path)
@@ -38,6 +37,14 @@ class HephBinaryResolver(
 
     companion object {
         const val BINARY_NAME = "heph"
+
+        /** `~` and `~/...` become the home directory; `~user/...` and everything else stay as they are. */
+        fun expandHome(path: String, home: String? = System.getProperty("user.home")): String = when {
+            home == null -> path
+            path == "~" -> home
+            path.startsWith("~/") || path.startsWith("~\\") -> home + path.substring(1)
+            else -> path
+        }
 
         fun defaultFallbacks(): List<Path> = listOf(
             Path.of(System.getProperty("user.home"), ".local", "bin", BINARY_NAME),

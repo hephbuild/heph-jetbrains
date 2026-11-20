@@ -84,4 +84,22 @@ class HephBinaryResolverTest {
             System.setProperty("user.home", oldHome)
         }
     }
+
+    @Test
+    fun expandHome() {
+        val cases = mapOf(
+            "tilde alone" to ("~" to "/home/me"),
+            "tilde slash path" to ("~/x" to "/home/me/x"),
+            "tilde slash nested" to ("~/bin/heph" to "/home/me/bin/heph"),
+            "other user is untouched" to ("~other/x" to "~other/x"),
+            "tilde inside is untouched" to ("/a/~/b" to "/a/~/b"),
+            "no tilde" to ("/usr/bin/heph" to "/usr/bin/heph"),
+            "relative" to ("bin/heph" to "bin/heph"),
+            "empty" to ("" to ""),
+        )
+        for ((name, case) in cases) {
+            assertEquals(name, case.second, HephBinaryResolver.expandHome(case.first, "/home/me"))
+        }
+        assertEquals("no home", "~/x", HephBinaryResolver.expandHome("~/x", null))
+    }
 }
