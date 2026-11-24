@@ -25,7 +25,7 @@ jobs:
     timeout-minutes: 30
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v7
 
       - uses: cachix/install-nix-action@v31
         with:
@@ -48,7 +48,7 @@ jobs:
         shell: devenv shell bash -- -e {0}
         run: ./gradlew buildPlugin -PpluginVersion="${{ steps.ver.outputs.version }}"
 
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v7
         with:
           name: heph-plugin-${{ steps.ver.outputs.version }}
           path: build/distributions/*.zip
