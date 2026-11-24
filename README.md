@@ -21,7 +21,7 @@ Enable debug logging for `#com.intellij.platform.lsp` and `#io.github.hephbuild.
 
 ## Development
 
-Requires JDK 21.
+Requires JDK 21, provided by `devenv shell`.
 
 ```
 ./gradlew test buildPlugin verifyPlugin
