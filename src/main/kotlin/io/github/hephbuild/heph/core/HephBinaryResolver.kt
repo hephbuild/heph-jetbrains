@@ -14,8 +14,8 @@ sealed interface HephBinaryResult {
 }
 
 class HephBinaryResolver(
-    private val findOnPath: () -> Path? = { PathEnvironmentVariableUtil.findInPath(BINARY_NAME)?.toPath() },
-    private val fallbacks: List<Path> = defaultFallbacks(),
+    private val findOnPath: (String) -> Path? = { PathEnvironmentVariableUtil.findInPath(it)?.toPath() },
+    private val fallbackDirs: List<Path> = defaultFallbackDirs(),
     private val exists: (Path) -> Boolean = Files::exists,
     private val isFile: (Path) -> Boolean = Files::isRegularFile,
     private val isExecutable: (Path) -> Boolean = Files::isExecutable,
@@ -30,13 +30,17 @@ class HephBinaryResolver(
                 else -> HephBinaryResult.Found(path)
             }
         }
-        findOnPath()?.let { return HephBinaryResult.Found(it) }
-        fallbacks.firstOrNull { isFile(it) && isExecutable(it) }?.let { return HephBinaryResult.Found(it) }
+        for (name in CANDIDATE_NAMES) {
+            findOnPath(name)?.let { return HephBinaryResult.Found(it) }
+            fallbackDirs.map { it.resolve(name) }.firstOrNull { isFile(it) && isExecutable(it) }
+                ?.let { return HephBinaryResult.Found(it) }
+        }
         return HephBinaryResult.NotFound(null)
     }
 
     companion object {
-        const val BINARY_NAME = "heph"
+        // TODO: remove "heph1" once v0 is gone.
+        val CANDIDATE_NAMES = listOf("heph1", "heph")
 
         /** `~` and `~/...` become the home directory; `~user/...` and everything else stay as they are. */
         fun expandHome(path: String, home: String? = System.getProperty("user.home")): String = when {
@@ -46,10 +50,10 @@ class HephBinaryResolver(
             else -> path
         }
 
-        fun defaultFallbacks(): List<Path> = listOf(
-            Path.of(System.getProperty("user.home"), ".local", "bin", BINARY_NAME),
-            Path.of("/opt/homebrew/bin", BINARY_NAME),
-            Path.of("/usr/local/bin", BINARY_NAME),
+        fun defaultFallbackDirs(): List<Path> = listOf(
+            Path.of(System.getProperty("user.home"), ".local", "bin"),
+            Path.of("/opt/homebrew/bin"),
+            Path.of("/usr/local/bin"),
         )
     }
 }
