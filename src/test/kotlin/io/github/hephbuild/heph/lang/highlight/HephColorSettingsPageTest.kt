@@ -1,10 +1,11 @@
 package io.github.hephbuild.heph.lang.highlight
 
 import com.intellij.psi.TokenType
+import io.github.hephbuild.heph.lang.HephFileType
+import io.github.hephbuild.heph.lang.HephIcons
 import io.github.hephbuild.heph.lang.lexer.HephLexer
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
-import org.junit.Assert.assertNotNull
 import org.junit.Assert.assertTrue
 import org.junit.Test
 
@@ -45,7 +46,8 @@ class HephColorSettingsPageTest {
     @Test
     fun pageMetadata() {
         assertTrue(page.highlighter is HephSyntaxHighlighter)
-        assertNotNull(page.icon)
+        assertEquals(HephIcons.FILE, page.icon)
+        assertEquals(HephIcons.FILE, HephFileType.icon)
         assertEquals("Heph", page.displayName)
     }
 }

@@ -7,10 +7,11 @@ import com.intellij.openapi.options.colors.ColorDescriptor
 import com.intellij.openapi.options.colors.ColorSettingsPage
 import io.github.hephbuild.heph.HephBundle
 import io.github.hephbuild.heph.lang.HephFileType
+import io.github.hephbuild.heph.lang.HephIcons
 import javax.swing.Icon
 
 class HephColorSettingsPage : ColorSettingsPage {
-    override fun getIcon(): Icon = HephFileType.icon
+    override fun getIcon(): Icon = HephIcons.FILE
 
     override fun getHighlighter(): SyntaxHighlighter = HephSyntaxHighlighter()
 
