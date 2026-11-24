@@ -2,7 +2,7 @@ name: CI
 
 # Tests and builds on pushes to main and on pull requests. The plugin is built
 # as a nightly, versioned by .github/workflows/version.sh
-# (<pluginVersion>-nightly.<timestamp>). All Gradle commands run inside the
+# (<pluginVersion>-snapshot.<timestamp>). All Gradle commands run inside the
 # devenv shell, matching heph-vscode.
 #
 # Publishing to the Marketplace `nightly` channel is off until the repository

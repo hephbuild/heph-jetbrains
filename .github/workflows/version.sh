@@ -3,11 +3,13 @@ set -euo pipefail
 
 # Prints the plugin version.
 #
-#   version.sh nightly            -> <pluginVersion>-nightly.<UTC yyyymmddHHMMSS>
+#   version.sh nightly            -> <pluginVersion>-snapshot.<UTC yyyymmddHHMMSS>
 #   version.sh release <tag>      -> <tag with leading v stripped>
 #
 # pluginVersion in gradle.properties is the next version to release, so a
-# nightly sorts above the last release and below the one it leads up to. The
+# nightly sorts above the last release and below the one it leads up to. That
+# needs a pre-release word the IDE's comparator knows (snapshot, alpha, beta,
+# rc, eap, ...); an unknown word such as "nightly" sorts above the release. The
 # timestamp keeps nightlies unique and strictly increasing. Release mode fails
 # when the tag differs from pluginVersion.
 
@@ -18,7 +20,7 @@ base=$(sed -n 's/^pluginVersion=//p' gradle.properties)
 
 case "$mode" in
   nightly)
-    echo "$base-nightly.$(date -u +%Y%m%d%H%M%S)"
+    echo "$base-snapshot.$(date -u +%Y%m%d%H%M%S)"
     ;;
   release)
     tag="${2:?release mode needs a tag}"
