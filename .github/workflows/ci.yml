@@ -1,7 +1,13 @@
 name: CI
 
-# Builds and tests on pushes to main and on pull requests. All build commands
-# run inside the devenv shell, matching heph-vscode.
+# Tests and builds on pushes to main and on pull requests. The plugin is built
+# as a nightly, versioned by .github/workflows/version.sh
+# (<pluginVersion>-nightly.<timestamp>). All Gradle commands run inside the
+# devenv shell, matching heph-vscode.
+#
+# Publishing to the Marketplace `nightly` channel is off until the repository
+# variable PUBLISH_NIGHTLY is set to "true" and the secret
+# JETBRAINS_MARKETPLACE_TOKEN exists. Only pushes to main publish.
 
 on:
   push:
@@ -27,15 +33,29 @@ jobs:
       - name: Install devenv.sh
         run: nix profile add nixpkgs#devenv
 
+      - name: Compute version
+        id: ver
+        run: |
+          VERSION=$(.github/workflows/version.sh nightly)
+          echo "version=$VERSION" >> "$GITHUB_OUTPUT"
+          echo "::notice title=Nightly version::$VERSION"
+
       - name: Test
         shell: devenv shell bash -- -e {0}
         run: ./gradlew test
 
       - name: Build plugin
         shell: devenv shell bash -- -e {0}
-        run: ./gradlew buildPlugin
+        run: ./gradlew buildPlugin -PpluginVersion="${{ steps.ver.outputs.version }}"
 
       - uses: actions/upload-artifact@v4
         with:
-          name: heph-plugin
+          name: heph-plugin-${{ steps.ver.outputs.version }}
           path: build/distributions/*.zip
+
+      - name: Publish to nightly channel
+        if: github.ref == 'refs/heads/main' && vars.PUBLISH_NIGHTLY == 'true'
+        shell: devenv shell bash -- -e {0}
+        env:
+          PUBLISH_TOKEN: ${{ secrets.JETBRAINS_MARKETPLACE_TOKEN }}
+        run: ./gradlew publishPlugin -PpluginVersion="${{ steps.ver.outputs.version }}" -PpublishChannel=nightly

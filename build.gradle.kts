@@ -8,7 +8,7 @@ plugins {
 }
 
 group = "io.github.hephbuild"
-version = "0.1.0"
+version = providers.gradleProperty("pluginVersion").get()
 
 kotlin {
     jvmToolchain(21)
@@ -41,6 +41,11 @@ intellijPlatform {
             sinceBuild = "253"
             untilBuild = provider { null }
         }
+    }
+
+    publishing {
+        token = providers.environmentVariable("PUBLISH_TOKEN")
+        channels = providers.gradleProperty("publishChannel").map { listOf(it) }.orElse(listOf("default"))
     }
 
     pluginVerification {
