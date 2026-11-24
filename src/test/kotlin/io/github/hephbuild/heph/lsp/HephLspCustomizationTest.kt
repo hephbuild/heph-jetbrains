@@ -21,7 +21,7 @@ class HephLspCustomizationTest : BasePlatformTestCase() {
 
     fun testDescriptorUsesHephFormatting() {
         val root = myFixture.tempDirFixture.createFile("repo/.hephconfig").parent
-        val descriptor = HephLspServerDescriptor(project, root, Path.of("/usr/local/bin/heph"))
+        val descriptor = HephLspClientDescriptor(project, root, Path.of("/usr/local/bin/heph"))
         assertTrue(descriptor.lspCustomization.formattingCustomizer is LspFormattingSupport)
         assertTrue(descriptor.lspCustomization.formattingCustomizer is HephFormattingSupport)
     }
@@ -30,7 +30,7 @@ class HephLspCustomizationTest : BasePlatformTestCase() {
         assertTrue(HephLspCustomization().completionCustomizer is HephCompletionSupport)
         assertTrue(HephLspCustomization().formattingCustomizer is HephFormattingSupport)
         val root = myFixture.tempDirFixture.createFile("repo/.hephconfig").parent
-        val descriptor = HephLspServerDescriptor(project, root, Path.of("/usr/local/bin/heph"))
+        val descriptor = HephLspClientDescriptor(project, root, Path.of("/usr/local/bin/heph"))
         assertTrue(descriptor.lspCustomization.completionCustomizer is HephCompletionSupport)
     }
 }

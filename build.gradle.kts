@@ -11,7 +11,7 @@ group = "io.github.hephbuild"
 version = providers.gradleProperty("pluginVersion").get()
 
 kotlin {
-    jvmToolchain(21)
+    jvmToolchain(25)
 }
 
 repositories {
@@ -23,7 +23,7 @@ repositories {
 
 dependencies {
     intellijPlatform {
-        intellijIdea("2025.3.1")
+        intellijIdea("2026.3.0.1")
         pluginVerifier()
         testFramework(TestFrameworkType.Platform)
     }
@@ -38,7 +38,7 @@ intellijPlatform {
     pluginConfiguration {
         version = project.version.toString()
         ideaVersion {
-            sinceBuild = "253"
+            sinceBuild = "263"
             untilBuild = provider { null }
         }
     }
@@ -50,8 +50,8 @@ intellijPlatform {
 
     pluginVerification {
         ides {
-            create(IntelliJPlatformType.IntellijIdea, "2025.3.1")
-            create(IntelliJPlatformType.GoLand, "2025.3.1")
+            create(IntelliJPlatformType.IntellijIdea, "2026.3.0.1")
+            create(IntelliJPlatformType.GoLand, "2026.3.0.1")
         }
     }
 }

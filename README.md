@@ -1,6 +1,6 @@
 # Heph for JetBrains IDEs
 
-[Heph](https://hephbuild.github.io/) support for JetBrains IDEs. Requires IntelliJ IDEA or GoLand 2025.3 or newer.
+[Heph](https://hephbuild.github.io/) support for JetBrains IDEs. Requires IntelliJ IDEA or GoLand 2026.3 or newer.
 
 ## Settings
 
@@ -21,7 +21,7 @@ Enable debug logging for `#com.intellij.platform.lsp` and `#io.github.hephbuild.
 
 ## Development
 
-Requires JDK 21, provided by `devenv shell`.
+Requires JDK 25, provided by `devenv shell`.
 
 ```
 ./gradlew test buildPlugin verifyPlugin

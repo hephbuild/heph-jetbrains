@@ -1,6 +1,7 @@
 package io.github.hephbuild.heph.core
 
-import com.intellij.execution.configurations.PathEnvironmentVariableUtil
+import com.intellij.util.EnvironmentUtil
+import java.io.File
 import java.nio.file.Files
 import java.nio.file.InvalidPathException
 import java.nio.file.Path
@@ -32,7 +33,7 @@ sealed interface HephBinaryResult {
 enum class HephPathState { Present, Absent, Unknown }
 
 class HephBinaryResolver(
-    private val findOnPath: (String) -> Path? = { PathEnvironmentVariableUtil.findInPath(it)?.toPath() },
+    private val findOnPath: (String) -> Path? = { findInPathValue(EnvironmentUtil.getValue("PATH"), it) },
     private val fallbackDirs: List<Path> = defaultFallbackDirs(),
     private val pathState: (Path) -> HephPathState = { probe(it) },
     private val isFile: (Path) -> Boolean = Files::isRegularFile,
@@ -77,6 +78,13 @@ class HephBinaryResolver(
     companion object {
         // TODO: remove "heph1" once v0 is gone.
         val CANDIDATE_NAMES = listOf("heph1", "heph")
+
+        /** First executable regular file called [name] in the [pathValue] directories; unusable entries are skipped. */
+        fun findInPathValue(pathValue: String?, name: String): Path? =
+            pathValue.orEmpty().split(File.pathSeparator).asSequence()
+                .filter { it.isNotEmpty() }
+                .mapNotNull { dir -> try { Path.of(dir, name) } catch (_: InvalidPathException) { null } }
+                .firstOrNull { Files.isRegularFile(it) && Files.isExecutable(it) }
 
         /** `~` and `~/...` become the home directory; `~user/...` and everything else stay as they are. */
         fun expandHome(path: String, home: String? = System.getProperty("user.home")): String = when {

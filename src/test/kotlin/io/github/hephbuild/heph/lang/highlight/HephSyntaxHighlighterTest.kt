@@ -37,10 +37,9 @@ class HephSyntaxHighlighterTest {
     }
 
     @Test
-    fun badCharacterWhitespaceAndNull() {
+    fun badCharacterAndWhitespace() {
         assertEquals(listOf(HighlighterColors.BAD_CHARACTER), highlighter.getTokenHighlights(TokenType.BAD_CHARACTER).toList())
         assertTrue(highlighter.getTokenHighlights(TokenType.WHITE_SPACE).isEmpty())
-        assertTrue(highlighter.getTokenHighlights(null).isEmpty())
     }
 
     @Test

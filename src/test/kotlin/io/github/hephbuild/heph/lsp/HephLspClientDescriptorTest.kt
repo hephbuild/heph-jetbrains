@@ -4,7 +4,7 @@ import io.github.hephbuild.heph.settings.HephSettings
 import com.intellij.testFramework.fixtures.BasePlatformTestCase
 import java.nio.file.Path
 
-class HephLspServerDescriptorTest : BasePlatformTestCase() {
+class HephLspClientDescriptorTest : BasePlatformTestCase() {
     override fun tearDown() {
         try {
             HephSettings.getInstance().extraFilePatterns = ""
@@ -20,7 +20,7 @@ class HephLspServerDescriptorTest : BasePlatformTestCase() {
         val insideExtra = fixture.createFile("repo/pkg/BUILD2")
         val insideOther = fixture.createFile("repo/pkg/main.go")
         val outside = fixture.createFile("other/BUILD")
-        val descriptor = HephLspServerDescriptor(project, root, Path.of("/usr/local/bin/heph"))
+        val descriptor = HephLspClientDescriptor(project, root, Path.of("/usr/local/bin/heph"))
 
         assertTrue(descriptor.isSupportedFile(inside))
         assertFalse(descriptor.isSupportedFile(insideExtra))
@@ -38,8 +38,8 @@ class HephLspServerDescriptorTest : BasePlatformTestCase() {
         val innerBuild = fixture.createFile("repo/sub/pkg/BUILD")
         val outerBuild = fixture.createFile("repo/pkg/BUILD")
         val bin = Path.of("/usr/local/bin/heph")
-        val outerDescriptor = HephLspServerDescriptor(project, outer, bin)
-        val innerDescriptor = HephLspServerDescriptor(project, inner, bin)
+        val outerDescriptor = HephLspClientDescriptor(project, outer, bin)
+        val innerDescriptor = HephLspClientDescriptor(project, inner, bin)
 
         assertFalse(outerDescriptor.isSupportedFile(innerBuild))
         assertTrue(innerDescriptor.isSupportedFile(innerBuild))
@@ -50,7 +50,7 @@ class HephLspServerDescriptorTest : BasePlatformTestCase() {
         val fixture = myFixture.tempDirFixture
         val root = fixture.createFile("repo/.hephconfig").parent
         val build = fixture.createFile("repo/BUILD")
-        val descriptor = HephLspServerDescriptor(project, root, Path.of("/usr/local/bin/heph"))
+        val descriptor = HephLspClientDescriptor(project, root, Path.of("/usr/local/bin/heph"))
 
         assertEquals("hephbuild", descriptor.getLanguageId(build))
         assertEquals(listOf(root), descriptor.roots.toList())

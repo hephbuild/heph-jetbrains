@@ -14,9 +14,8 @@ import io.github.hephbuild.heph.lang.lexer.HephTokenTypes
 class HephSyntaxHighlighter : SyntaxHighlighterBase() {
     override fun getHighlightingLexer(): Lexer = HephLexer()
 
-    override fun getTokenHighlights(tokenType: IElementType?): Array<TextAttributesKey> =
+    override fun getTokenHighlights(tokenType: IElementType): Array<TextAttributesKey> =
         when (tokenType) {
-            null -> EMPTY
             TokenType.BAD_CHARACTER -> BAD
             else -> TOKEN_KEYS[tokenType]?.let { pack(it) } ?: EMPTY
         }

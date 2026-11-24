@@ -3,11 +3,11 @@ package io.github.hephbuild.heph.lsp
 import io.github.hephbuild.heph.settings.HephSettings
 import com.intellij.notification.Notification
 import com.intellij.notification.Notifications
-import com.intellij.platform.lsp.api.LspServerDescriptor
-import com.intellij.platform.lsp.api.LspServerSupportProvider
+import com.intellij.platform.lsp.api.LspClientDescriptor
+import com.intellij.platform.lsp.api.LspIntegrationProvider
 import com.intellij.testFramework.fixtures.BasePlatformTestCase
 
-class HephLspServerSupportProviderTest : BasePlatformTestCase() {
+class HephLspIntegrationProviderTest : BasePlatformTestCase() {
     override fun tearDown() {
         try {
             HephSettings.getInstance().binaryPath = ""
@@ -27,8 +27,8 @@ class HephLspServerSupportProviderTest : BasePlatformTestCase() {
             },
         )
         var started = 0
-        val starter = object : LspServerSupportProvider.LspServerStarter {
-            override fun ensureServerStarted(descriptor: LspServerDescriptor) {
+        val starter = object : LspIntegrationProvider.LspClientStarter {
+            override fun ensureClientStarted(descriptor: LspClientDescriptor) {
                 started++
             }
         }
@@ -37,7 +37,7 @@ class HephLspServerSupportProviderTest : BasePlatformTestCase() {
         fixture.createFile("repo/.hephconfig")
         val build = fixture.createFile("repo/BUILD")
 
-        val provider = HephLspServerSupportProvider()
+        val provider = HephLspIntegrationProvider()
         provider.fileOpened(project, build, starter)
         provider.fileOpened(project, build, starter)
 
@@ -57,8 +57,8 @@ class HephLspServerSupportProviderTest : BasePlatformTestCase() {
             },
         )
         var started = 0
-        val starter = object : LspServerSupportProvider.LspServerStarter {
-            override fun ensureServerStarted(descriptor: LspServerDescriptor) {
+        val starter = object : LspIntegrationProvider.LspClientStarter {
+            override fun ensureClientStarted(descriptor: LspClientDescriptor) {
                 started++
             }
         }
@@ -68,7 +68,7 @@ class HephLspServerSupportProviderTest : BasePlatformTestCase() {
         fixture.createFile("repo/.hephconfig")
         val build = fixture.createFile("repo/BUILD")
 
-        HephLspServerSupportProvider().fileOpened(project, build, starter)
+        HephLspIntegrationProvider().fileOpened(project, build, starter)
 
         assertEquals(0, started)
         assertEquals(1, notifications.size)
@@ -86,8 +86,8 @@ class HephLspServerSupportProviderTest : BasePlatformTestCase() {
             },
         )
         var started = 0
-        val starter = object : LspServerSupportProvider.LspServerStarter {
-            override fun ensureServerStarted(descriptor: LspServerDescriptor) {
+        val starter = object : LspIntegrationProvider.LspClientStarter {
+            override fun ensureClientStarted(descriptor: LspClientDescriptor) {
                 started++
             }
         }
@@ -100,7 +100,7 @@ class HephLspServerSupportProviderTest : BasePlatformTestCase() {
         }
         HephSettings.getInstance().binaryPath = bin.path
 
-        val provider = HephLspServerSupportProvider()
+        val provider = HephLspIntegrationProvider()
         provider.isTrusted = { false }
         provider.fileOpened(project, build, starter)
         assertEquals(0, started)

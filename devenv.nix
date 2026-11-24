@@ -4,7 +4,7 @@
   # https://devenv.sh/basics/
   languages.java = {
     enable = true;
-    jdk.package = pkgs.jdk21;
+    jdk.package = pkgs.jdk25;
   };
 
   # Gradle comes from the checked-in wrapper.

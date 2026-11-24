@@ -9,7 +9,7 @@ import com.intellij.openapi.diagnostic.logger
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.vfs.VfsUtilCore
 import com.intellij.openapi.vfs.VirtualFile
-import com.intellij.platform.lsp.api.LspServerDescriptor
+import com.intellij.platform.lsp.api.LspClientDescriptor
 import com.intellij.platform.lsp.api.LspServerListener
 import com.intellij.platform.lsp.api.customization.LspCustomization
 import io.github.hephbuild.heph.notify.HephNotifier
@@ -17,11 +17,11 @@ import org.eclipse.lsp4j.InitializeResult
 import java.nio.file.Path
 
 /** One server per heph root: the server handles a single workspace folder. */
-class HephLspServerDescriptor(
+class HephLspClientDescriptor(
     project: Project,
     private val root: VirtualFile,
     private val binary: Path,
-) : LspServerDescriptor(project, "heph", root) {
+) : LspClientDescriptor(project, "heph", root) {
 
     override fun isSupportedFile(file: VirtualFile): Boolean =
         VfsUtilCore.isAncestor(root, file, true) && HephBuildFiles.rootFor(file) == root
@@ -47,13 +47,13 @@ class HephLspServerDescriptor(
         HephCommandLine.build(binary, HephSettings.getInstance().serverArgs, root.toNioPath())
 
     override fun equals(other: Any?): Boolean =
-        other is HephLspServerDescriptor && other.project == project && other.root == root
+        other is HephLspClientDescriptor && other.project == project && other.root == root
 
     override fun hashCode(): Int = 31 * project.hashCode() + root.hashCode()
 
     companion object {
         const val LANGUAGE_ID = "hephbuild"
         private val CUSTOMIZATION = HephLspCustomization()
-        private val LOG = logger<HephLspServerDescriptor>()
+        private val LOG = logger<HephLspClientDescriptor>()
     }
 }

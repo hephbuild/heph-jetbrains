@@ -314,4 +314,28 @@ class HephBinaryResolverTest {
         }
         assertEquals("no home", "/h/.local/bin", HephBinaryResolver.displayPath(Path.of("/h/.local/bin"), null))
     }
+
+    @Test
+    fun findInPathValue() {
+        val sep = java.io.File.pathSeparator
+        val plain = tmp.newFolder("plain")
+        val noExec = tmp.newFolder("noexec").also { it.resolve("heph").apply { writeText(""); setExecutable(false) } }
+        val dirNamedLikeBinary = tmp.newFolder("dirbin").also { it.resolve("heph").mkdir() }
+        val good = tmp.newFolder("good").also { it.resolve("heph").apply { writeText(""); setExecutable(true) } }
+        val later = tmp.newFolder("later").also { it.resolve("heph").apply { writeText(""); setExecutable(true) } }
+        val missing = tmp.root.resolve("missing")
+
+        val cases = mapOf(
+            "null path" to (null to null),
+            "empty path" to ("" to null),
+            "no directory has it" to (plain.path to null),
+            "non-executable file is skipped" to (noExec.path to null),
+            "directory with the binary's name is skipped" to (dirNamedLikeBinary.path to null),
+            "missing and empty entries are skipped" to ("$sep${missing.path}$sep${good.path}" to good.resolve("heph").toPath()),
+            "first match in order wins" to ("${noExec.path}$sep${good.path}$sep${later.path}" to good.resolve("heph").toPath()),
+        )
+        for ((name, case) in cases) {
+            assertEquals(name, case.second, HephBinaryResolver.findInPathValue(case.first, "heph"))
+        }
+    }
 }

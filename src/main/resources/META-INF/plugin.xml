@@ -9,7 +9,7 @@
         Starts <code>heph tool build-lsp</code> for BUILD files inside a heph repository and provides
         diagnostics, completion, hover, go to definition and formatting. Adds a "Heph" file type with syntax
         highlighting, a colour settings page, commenting, brace matching and quote handling.
-        Requires an IDE with native LSP support (IntelliJ IDEA, GoLand and other 2025.3+ IDEs).
+        Requires an IDE with native LSP support (IntelliJ IDEA, GoLand and other 2026.3+ IDEs).
     ]]></description>
 
     <depends>com.intellij.modules.platform</depends>
@@ -34,8 +34,8 @@
         <enterHandlerDelegate implementation="io.github.hephbuild.heph.lang.editor.HephEnterHandler" order="first"/>
         <typedHandler implementation="io.github.hephbuild.heph.lang.editor.HephClosingBracketHandler"/>
 
-        <platform.lsp.serverSupportProvider
-                implementation="io.github.hephbuild.heph.lsp.HephLspServerSupportProvider"/>
+        <platform.lsp.integrationProvider
+                implementation="io.github.hephbuild.heph.lsp.HephLspIntegrationProvider"/>
 
         <applicationConfigurable
                 parentId="language"

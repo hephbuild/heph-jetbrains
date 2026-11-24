@@ -9,9 +9,9 @@ import com.intellij.ide.trustedProjects.TrustedProjects
 import com.intellij.openapi.components.service
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.vfs.VirtualFile
-import com.intellij.platform.lsp.api.LspServerSupportProvider
+import com.intellij.platform.lsp.api.LspIntegrationProvider
 
-class HephLspServerSupportProvider : LspServerSupportProvider {
+class HephLspIntegrationProvider : LspIntegrationProvider {
     var resolver: HephBinaryResolver = HephBinaryResolver()
 
     /** Heph may download and run a version pinned in `.hephconfig`, so never start it in untrusted projects. */
@@ -20,7 +20,7 @@ class HephLspServerSupportProvider : LspServerSupportProvider {
     override fun fileOpened(
         project: Project,
         file: VirtualFile,
-        serverStarter: LspServerSupportProvider.LspServerStarter,
+        clientStarter: LspIntegrationProvider.LspClientStarter,
     ) {
         if (!isTrusted(project)) return
         val settings = HephSettings.getInstance()
@@ -28,7 +28,7 @@ class HephLspServerSupportProvider : LspServerSupportProvider {
 
         when (val result = resolver.resolve(settings.binaryPath)) {
             is HephBinaryResult.Found ->
-                serverStarter.ensureServerStarted(HephLspServerDescriptor(project, root, result.path))
+                clientStarter.ensureClientStarted(HephLspClientDescriptor(project, root, result.path))
             else -> project.service<HephNotifier>().binaryProblem(result)
         }
     }
