@@ -1,6 +1,7 @@
 package io.github.hephbuild.heph.notify
 
 import io.github.hephbuild.heph.HephBundle
+import io.github.hephbuild.heph.core.HephBinaryMessages
 import io.github.hephbuild.heph.core.HephBinaryResult
 import io.github.hephbuild.heph.settings.HephConfigurable
 import com.intellij.notification.NotificationAction
@@ -20,18 +21,10 @@ class HephNotifier(private val project: Project) : Disposable {
     fun binaryProblem(result: HephBinaryResult) {
         when (result) {
             is HephBinaryResult.Found -> Unit
-            is HephBinaryResult.NotFound -> {
-                val content = if (result.explicit == null) {
-                    HephBundle.message("notification.binary.notFound.content")
-                } else {
-                    HephBundle.message("notification.binary.invalidPath.content", result.explicit)
-                }
-                post("notFound:${result.explicit}", HephBundle.message("notification.binary.notFound.title"), content, null)
-            }
-            is HephBinaryResult.NotExecutable -> post(
-                "notExecutable:${result.path}",
-                HephBundle.message("notification.binary.notExecutable.title"),
-                HephBundle.message("notification.binary.notExecutable.content", result.path),
+            is HephBinaryResult.Failure -> post(
+                HephBinaryMessages.key(result),
+                HephBinaryMessages.title(result),
+                HephBinaryMessages.content(result),
                 null,
             )
         }

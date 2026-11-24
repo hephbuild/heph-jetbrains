@@ -43,6 +43,36 @@ class HephLspServerSupportProviderTest : BasePlatformTestCase() {
 
         assertEquals(0, started)
         assertEquals(1, notifications.size)
+        assertTrue(notifications[0].content, notifications[0].content.contains("/nonexistent/heph"))
+    }
+
+    fun testConfiguredDirectoryNotifiesNotAFile() {
+        val notifications = mutableListOf<Notification>()
+        project.messageBus.connect(testRootDisposable).subscribe(
+            Notifications.TOPIC,
+            object : Notifications {
+                override fun notify(notification: Notification) {
+                    notifications += notification
+                }
+            },
+        )
+        var started = 0
+        val starter = object : LspServerSupportProvider.LspServerStarter {
+            override fun ensureServerStarted(descriptor: LspServerDescriptor) {
+                started++
+            }
+        }
+        val dir = java.nio.file.Files.createTempDirectory("heph-dir").toFile().apply { deleteOnExit() }
+        HephSettings.getInstance().binaryPath = dir.path
+        val fixture = myFixture.tempDirFixture
+        fixture.createFile("repo/.hephconfig")
+        val build = fixture.createFile("repo/BUILD")
+
+        HephLspServerSupportProvider().fileOpened(project, build, starter)
+
+        assertEquals(0, started)
+        assertEquals(1, notifications.size)
+        assertTrue(notifications[0].content, notifications[0].content.contains("${dir.path} is not a file"))
     }
 
     fun testUntrustedProjectStartsNothingAndStaysSilent() {

@@ -2,6 +2,7 @@ package io.github.hephbuild.heph.settings
 
 import io.github.hephbuild.heph.HephBundle
 import io.github.hephbuild.heph.filetype.HephFileTypeRefresher
+import io.github.hephbuild.heph.core.HephBinaryMessages
 import io.github.hephbuild.heph.core.HephBinaryResolver
 import io.github.hephbuild.heph.core.HephBinaryResult
 import io.github.hephbuild.heph.lsp.HephLspRestarter
@@ -17,12 +18,16 @@ class HephConfigurable : BoundConfigurable(HephBundle.message("settings.title"))
     override fun createPanel(): DialogPanel {
         val settings = HephSettings.getInstance()
         // Silent first-run seeding, before the fields are bound, so the page does not open as modified.
-        val detected = (HephBinaryResolver().resolve("") as? HephBinaryResult.Found)?.path?.toString()
+        val detection = HephBinaryResolver().resolve("")
+        val detected = (detection as? HephBinaryResult.Found)?.path?.toString()
         val seeded = HephSettings.seedBinaryPath(settings.binaryPath, detected)
         if (seeded != settings.binaryPath) settings.binaryPath = seeded
-        val binaryComment = HephBundle.message(
-            if (seeded.isBlank()) "settings.binary.notDetected" else "settings.binary.comment",
-        )
+        val binaryComment = if (seeded.isBlank()) {
+            val searched = (detection as? HephBinaryResult.NotFound.AutoDetect)?.let(HephBinaryMessages::searched).orEmpty()
+            HephBundle.message("settings.binary.notDetected", searched)
+        } else {
+            HephBundle.message("settings.binary.comment")
+        }
         return panel {
             row(HephBundle.message("settings.binary")) {
                 textFieldWithBrowseButton(
