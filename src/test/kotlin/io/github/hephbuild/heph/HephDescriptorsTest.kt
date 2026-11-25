@@ -120,6 +120,16 @@ class HephDescriptorsTest {
     }
 
     @Test
+    fun iconProviderLivesOnlyInBackendAndRunsBeforeIconPacks() {
+        val provider = module("backend").getElementsByTagName("iconProvider").elements().single()
+        assertEquals("io.github.hephbuild.heph.filetype.HephIconProvider", provider.getAttribute("implementation"))
+        assertEquals("first, before IconProvider", provider.getAttribute("order"))
+        for (entry in listOf("root" to root(), "shared" to module("shared"), "frontend" to module("frontend"))) {
+            assertFalse(entry.first, entry.second.text().contains("iconProvider"))
+        }
+    }
+
+    @Test
     fun settingsPageAndNotificationGroupLiveOnlyInFrontend() {
         val frontend = module("frontend").text()
         val configurable = module("frontend").getElementsByTagName("applicationConfigurable").elements().single()

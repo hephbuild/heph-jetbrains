@@ -19,8 +19,9 @@ get the language server. Colours: Settings | Editor | Color Scheme | Heph.
 Install the plugin on both the host and the client. The language server runs on the host, which
 resolves `heph` from the IDE process `PATH`; if it is not found, set the full path in the settings.
 
-File icon packs installed on the host (Catppuccin Icons, Atom Material Icons, ...) can leave the
-Heph file icon blank on the client, as their icons are not available there. Disable them if so.
+The Heph file icon is ordered ahead of Catppuccin Icons. Other icon packs installed on the host
+(Atom Material Icons, ...) can leave it blank on the client, as their icons are not available
+there. Disable them if so.
 
 ## Debugging
 

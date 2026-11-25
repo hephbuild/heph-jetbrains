@@ -14,6 +14,10 @@
     <extensions defaultExtensionNs="com.intellij">
         <fileTypeOverrider implementation="io.github.hephbuild.heph.filetype.HephFileTypeOverrider"/>
 
+        <!-- "IconProvider" is the id of the Catppuccin Icons provider; `first` alone ties with it. -->
+        <iconProvider implementation="io.github.hephbuild.heph.filetype.HephIconProvider"
+                      id="HephIconProvider" order="first, before IconProvider"/>
+
         <platform.lsp.integrationProvider
                 implementation="io.github.hephbuild.heph.lsp.HephLspIntegrationProvider"/>
 

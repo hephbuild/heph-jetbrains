@@ -7,6 +7,9 @@ body:
     attributes:
       value: |
         Thanks for taking the time to fill out this bug report!
+
+        Before reporting, please check the problem still happens with other plugins disabled,
+        especially icon packs and themes, which can hide file icons in remote development.
   - type: textarea
     id: description
     attributes:
