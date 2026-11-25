@@ -5,7 +5,7 @@ name: CI
 # (<pluginVersion>-snapshot.<timestamp>). All Gradle commands run inside the
 # devenv shell, matching heph-vscode.
 #
-# Publishing to the Marketplace `nightly` channel is off until the repository
+# Publishing to the Marketplace `Nightly` channel is off until the repository
 # variable PUBLISH_NIGHTLY is set to "true" and the secret
 # JETBRAINS_MARKETPLACE_TOKEN exists. Only pushes to main publish.
 
@@ -66,9 +66,9 @@ jobs:
           name: heph-plugin-${{ steps.ver.outputs.version }}
           path: build/distributions/*.zip
 
-      - name: Publish to nightly channel
+      - name: Publish to Nightly channel
         if: github.ref == 'refs/heads/main' && vars.PUBLISH_NIGHTLY == 'true'
         shell: devenv shell bash -- -e {0}
         env:
           PUBLISH_TOKEN: ${{ secrets.JETBRAINS_MARKETPLACE_TOKEN }}
-        run: ./gradlew publishPlugin -PpluginVersion="${{ steps.ver.outputs.version }}" -PpublishChannel=nightly
+        run: ./gradlew publishPlugin -PpluginVersion="${{ steps.ver.outputs.version }}" -PpublishChannel=Nightly
