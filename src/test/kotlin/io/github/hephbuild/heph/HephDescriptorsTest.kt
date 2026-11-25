@@ -118,4 +118,19 @@ class HephDescriptorsTest {
         }
         assertTrue(module("backend").text().contains("platform.rpc.backend.remoteApiProvider"))
     }
+
+    @Test
+    fun settingsPageAndNotificationGroupLiveOnlyInFrontend() {
+        val frontend = module("frontend").text()
+        val configurable = module("frontend").getElementsByTagName("applicationConfigurable").elements().single()
+        assertEquals("io.github.hephbuild.heph.settings", configurable.getAttribute("id"))
+        assertEquals("io.github.hephbuild.heph.frontend.settings.HephConfigurable", configurable.getAttribute("instance"))
+        assertTrue(frontend.contains("notificationGroup"))
+        assertTrue(frontend.contains("messages.HephBundle"))
+        for (entry in listOf("root" to root(), "shared" to module("shared"), "backend" to module("backend"))) {
+            val text = entry.second.text()
+            assertFalse("${entry.first} registers a configurable", text.contains("applicationConfigurable"))
+            assertFalse("${entry.first} registers a notification group", text.contains("notificationGroup"))
+        }
+    }
 }

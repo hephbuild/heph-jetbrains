@@ -1,8 +1,9 @@
 package io.github.hephbuild.heph.lsp
 
+import io.github.hephbuild.heph.notify.HephNotifier
+import io.github.hephbuild.heph.notify.drain
 import io.github.hephbuild.heph.settings.HephSettings
-import com.intellij.notification.Notification
-import com.intellij.notification.Notifications
+import com.intellij.openapi.components.service
 import com.intellij.platform.lsp.api.LspClientDescriptor
 import com.intellij.platform.lsp.api.LspIntegrationProvider
 import com.intellij.testFramework.fixtures.BasePlatformTestCase
@@ -17,15 +18,9 @@ class HephLspIntegrationProviderTest : BasePlatformTestCase() {
     }
 
     fun testMissingBinaryNotifiesOnceAndStartsNothing() {
-        val notifications = mutableListOf<Notification>()
-        project.messageBus.connect(testRootDisposable).subscribe(
-            Notifications.TOPIC,
-            object : Notifications {
-                override fun notify(notification: Notification) {
-                    notifications += notification
-                }
-            },
-        )
+        val notifier = project.service<HephNotifier>()
+        notifier.reset()
+        notifier.drain()
         var started = 0
         val starter = object : LspIntegrationProvider.LspClientStarter {
             override fun ensureClientStarted(descriptor: LspClientDescriptor) {
@@ -42,20 +37,15 @@ class HephLspIntegrationProviderTest : BasePlatformTestCase() {
         provider.fileOpened(project, build, starter)
 
         assertEquals(0, started)
+        val notifications = notifier.drain()
         assertEquals(1, notifications.size)
         assertTrue(notifications[0].content, notifications[0].content.contains("/nonexistent/heph"))
     }
 
     fun testConfiguredDirectoryNotifiesNotAFile() {
-        val notifications = mutableListOf<Notification>()
-        project.messageBus.connect(testRootDisposable).subscribe(
-            Notifications.TOPIC,
-            object : Notifications {
-                override fun notify(notification: Notification) {
-                    notifications += notification
-                }
-            },
-        )
+        val notifier = project.service<HephNotifier>()
+        notifier.reset()
+        notifier.drain()
         var started = 0
         val starter = object : LspIntegrationProvider.LspClientStarter {
             override fun ensureClientStarted(descriptor: LspClientDescriptor) {
@@ -71,20 +61,15 @@ class HephLspIntegrationProviderTest : BasePlatformTestCase() {
         HephLspIntegrationProvider().fileOpened(project, build, starter)
 
         assertEquals(0, started)
+        val notifications = notifier.drain()
         assertEquals(1, notifications.size)
         assertTrue(notifications[0].content, notifications[0].content.contains("${dir.path} is not a file"))
     }
 
     fun testUntrustedProjectStartsNothingAndStaysSilent() {
-        val notifications = mutableListOf<Notification>()
-        project.messageBus.connect(testRootDisposable).subscribe(
-            Notifications.TOPIC,
-            object : Notifications {
-                override fun notify(notification: Notification) {
-                    notifications += notification
-                }
-            },
-        )
+        val notifier = project.service<HephNotifier>()
+        notifier.reset()
+        notifier.drain()
         var started = 0
         val starter = object : LspIntegrationProvider.LspClientStarter {
             override fun ensureClientStarted(descriptor: LspClientDescriptor) {
@@ -104,7 +89,7 @@ class HephLspIntegrationProviderTest : BasePlatformTestCase() {
         provider.isTrusted = { false }
         provider.fileOpened(project, build, starter)
         assertEquals(0, started)
-        assertTrue(notifications.isEmpty())
+        assertTrue(notifier.drain().isEmpty())
 
         provider.isTrusted = { true }
         provider.fileOpened(project, build, starter)

@@ -16,6 +16,7 @@ import com.intellij.openapi.options.colors.ColorSettingsPages
 import com.intellij.platform.lsp.api.LspIntegrationProvider
 import com.intellij.testFramework.fixtures.BasePlatformTestCase
 import io.github.hephbuild.heph.filetype.HephFileTypeOverrider
+import io.github.hephbuild.heph.frontend.settings.HephConfigurable
 import io.github.hephbuild.heph.lang.HephFileType
 import io.github.hephbuild.heph.lang.HephLanguage
 import io.github.hephbuild.heph.lang.editor.HephBraceMatcher
@@ -52,8 +53,9 @@ class HephPluginModulesTest : BasePlatformTestCase() {
     }
 
     fun testSettingsPageRegistered() {
-        val ids = Configurable.APPLICATION_CONFIGURABLE.extensionList.map { it.id }
-        assertTrue(ids.toString(), "io.github.hephbuild.heph.settings" in ids)
+        val ep = Configurable.APPLICATION_CONFIGURABLE.extensionList.firstOrNull { it.id == "io.github.hephbuild.heph.settings" }
+        assertNotNull("settings page is not registered", ep)
+        assertEquals(HephConfigurable::class.java.name, ep!!.instanceClass)
     }
 
     fun testRemoteApiProviderRegistered() {

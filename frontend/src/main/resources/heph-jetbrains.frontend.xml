@@ -1,10 +1,24 @@
 <idea-plugin>
     <dependencies>
         <module name="intellij.platform.frontend"/>
+        <module name="intellij.platform.rpc"/>
         <module name="heph-jetbrains.shared"/>
     </dependencies>
 
+    <resource-bundle>messages.HephBundle</resource-bundle>
+
     <extensions defaultExtensionNs="com.intellij">
         <colorSettingsPage implementation="io.github.hephbuild.heph.lang.highlight.HephColorSettingsPage"/>
+
+        <applicationConfigurable
+                parentId="language"
+                id="io.github.hephbuild.heph.settings"
+                instance="io.github.hephbuild.heph.frontend.settings.HephConfigurable"
+                displayName="Heph"/>
+
+        <notificationGroup id="Heph" displayType="BALLOON" bundle="messages.HephBundle"
+                           key="notification.group.name"/>
+
+        <postStartupActivity implementation="io.github.hephbuild.heph.frontend.notify.HephNotificationsSubscriber"/>
     </extensions>
 </idea-plugin>

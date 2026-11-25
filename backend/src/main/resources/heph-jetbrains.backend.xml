@@ -19,15 +19,6 @@
 
         <platform.rpc.backend.remoteApiProvider
                 implementation="io.github.hephbuild.heph.rpc.HephRemoteApiProvider"/>
-
-        <applicationConfigurable
-                parentId="language"
-                id="io.github.hephbuild.heph.settings"
-                instance="io.github.hephbuild.heph.settings.HephConfigurable"
-                displayName="Heph"/>
-
-        <notificationGroup id="Heph" displayType="BALLOON" bundle="messages.HephBundle"
-                           key="notification.group.name"/>
     </extensions>
 
     <applicationListeners>

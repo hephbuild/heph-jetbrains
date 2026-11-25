@@ -1,22 +1,27 @@
 package io.github.hephbuild.heph.notify
 
+import com.intellij.openapi.Disposable
+import com.intellij.openapi.components.Service
+import com.intellij.openapi.diagnostic.logger
 import io.github.hephbuild.heph.HephBundle
 import io.github.hephbuild.heph.core.HephBinaryMessages
 import io.github.hephbuild.heph.core.HephBinaryResult
-import io.github.hephbuild.heph.settings.HephConfigurable
-import com.intellij.notification.NotificationAction
-import com.intellij.notification.NotificationGroupManager
-import com.intellij.notification.NotificationType
-import com.intellij.openapi.Disposable
-import com.intellij.openapi.components.Service
-import com.intellij.openapi.options.ShowSettingsUtil
-import com.intellij.openapi.project.Project
+import io.github.hephbuild.heph.rpc.HephNotificationDto
+import kotlinx.coroutines.channels.BufferOverflow
+import kotlinx.coroutines.channels.Channel
+import kotlinx.coroutines.channels.ReceiveChannel
 import java.util.concurrent.ConcurrentHashMap
 
-/** Notifications are de-duplicated per project per session. */
+/**
+ * Decides and de-duplicates notifications per project per session; the frontend shows them.
+ * Events buffer (newest 16) until a frontend subscribes and are consumed once.
+ */
 @Service(Service.Level.PROJECT)
-class HephNotifier(private val project: Project) : Disposable {
+class HephNotifier : Disposable {
     private val shown = ConcurrentHashMap.newKeySet<String>()
+    private val channel = Channel<HephNotificationDto>(CAPACITY, BufferOverflow.DROP_OLDEST)
+
+    val events: ReceiveChannel<HephNotificationDto> get() = channel
 
     fun binaryProblem(result: HephBinaryResult) {
         when (result) {
@@ -25,7 +30,7 @@ class HephNotifier(private val project: Project) : Disposable {
                 HephBinaryMessages.key(result),
                 HephBinaryMessages.title(result),
                 HephBinaryMessages.content(result),
-                null,
+                restartable = false,
             )
         }
     }
@@ -35,38 +40,28 @@ class HephNotifier(private val project: Project) : Disposable {
         shown.clear()
     }
 
-    /** [restart] runs from the notification's Restart action. */
-    fun serverCrashed(restart: () -> Unit) {
+    fun serverCrashed() {
         post(
             CRASHED_KEY,
             HephBundle.message("notification.server.crashed.title"),
             HephBundle.message("notification.server.crashed.content"),
-            restart,
+            restartable = true,
         )
     }
 
-    private fun post(key: String, title: String, content: String, restart: (() -> Unit)?) {
+    private fun post(key: String, title: String, content: String, restartable: Boolean) {
         if (!shown.add(key)) return
-        val notification = NotificationGroupManager.getInstance()
-            .getNotificationGroup(GROUP_ID)
-            .createNotification(title, content, NotificationType.ERROR)
-        if (restart != null) {
-            notification.addAction(
-                NotificationAction.createSimple(HephBundle.message("notification.action.restart")) { restart() },
-            )
-        }
-        notification.addAction(
-            NotificationAction.createSimple(HephBundle.message("notification.action.openSettings")) {
-                ShowSettingsUtil.getInstance().showSettingsDialog(project, HephConfigurable::class.java)
-            },
-        )
-        notification.notify(project)
+        LOG.info("$title: $content")
+        channel.trySend(HephNotificationDto(title, content, restartable))
     }
 
-    override fun dispose() = Unit
+    override fun dispose() {
+        channel.close()
+    }
 
     companion object {
-        const val GROUP_ID = "Heph"
+        private const val CAPACITY = 16
         private const val CRASHED_KEY = "crashed"
+        private val LOG = logger<HephNotifier>()
     }
 }
