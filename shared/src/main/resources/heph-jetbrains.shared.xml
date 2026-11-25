@@ -1,0 +1,19 @@
+<idea-plugin>
+    <resource-bundle>messages.HephBundle</resource-bundle>
+
+    <extensions defaultExtensionNs="com.intellij">
+        <fileType name="Heph"
+                  implementationClass="io.github.hephbuild.heph.lang.HephFileType"
+                  fieldName="INSTANCE"
+                  language="HephBuild"/>
+        <lang.parserDefinition language="HephBuild"
+                               implementationClass="io.github.hephbuild.heph.lang.parser.HephParserDefinition"/>
+        <lang.syntaxHighlighterFactory language="HephBuild"
+                                       implementationClass="io.github.hephbuild.heph.lang.highlight.HephSyntaxHighlighterFactory"/>
+        <lang.commenter language="HephBuild" implementationClass="io.github.hephbuild.heph.lang.editor.HephCommenter"/>
+        <lang.braceMatcher language="HephBuild" implementationClass="io.github.hephbuild.heph.lang.editor.HephBraceMatcher"/>
+        <lang.quoteHandler language="HephBuild" implementationClass="io.github.hephbuild.heph.lang.editor.HephQuoteHandler"/>
+        <enterHandlerDelegate implementation="io.github.hephbuild.heph.lang.editor.HephEnterHandler" order="first"/>
+        <typedHandler implementation="io.github.hephbuild.heph.lang.editor.HephClosingBracketHandler"/>
+    </extensions>
+</idea-plugin>

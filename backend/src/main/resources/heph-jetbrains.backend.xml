@@ -1,0 +1,31 @@
+<idea-plugin>
+    <dependencies>
+        <module name="intellij.platform.backend"/>
+        <module name="intellij.platform.lsp"/>
+        <module name="intellij.platform.lsp.impl"/>
+        <module name="heph-jetbrains.shared"/>
+    </dependencies>
+
+    <resource-bundle>messages.HephBundle</resource-bundle>
+
+    <extensions defaultExtensionNs="com.intellij">
+        <fileTypeOverrider implementation="io.github.hephbuild.heph.filetype.HephFileTypeOverrider"/>
+
+        <platform.lsp.integrationProvider
+                implementation="io.github.hephbuild.heph.lsp.HephLspIntegrationProvider"/>
+
+        <applicationConfigurable
+                parentId="language"
+                id="io.github.hephbuild.heph.settings"
+                instance="io.github.hephbuild.heph.settings.HephConfigurable"
+                displayName="Heph"/>
+
+        <notificationGroup id="Heph" displayType="BALLOON" bundle="messages.HephBundle"
+                           key="notification.group.name"/>
+    </extensions>
+
+    <applicationListeners>
+        <listener class="io.github.hephbuild.heph.filetype.HephConfigFileListener"
+                  topic="com.intellij.openapi.vfs.newvfs.BulkFileListener"/>
+    </applicationListeners>
+</idea-plugin>

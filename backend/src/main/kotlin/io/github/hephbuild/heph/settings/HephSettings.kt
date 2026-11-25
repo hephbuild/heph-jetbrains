@@ -3,6 +3,7 @@ package io.github.hephbuild.heph.settings
 import io.github.hephbuild.heph.core.HephCommandLine
 import io.github.hephbuild.heph.core.HephFileMatcher
 import com.intellij.openapi.components.BaseState
+import com.intellij.openapi.components.RoamingType
 import com.intellij.openapi.components.Service
 import com.intellij.openapi.components.SimplePersistentStateComponent
 import com.intellij.openapi.components.State
@@ -10,7 +11,7 @@ import com.intellij.openapi.components.Storage
 import com.intellij.openapi.components.service
 
 @Service(Service.Level.APP)
-@State(name = "HephSettings", storages = [Storage("heph.xml")])
+@State(name = "HephSettings", storages = [Storage(value = "heph.xml", roamingType = RoamingType.DISABLED)])
 class HephSettings : SimplePersistentStateComponent<HephSettings.State>(State()) {
     class State : BaseState() {
         var binaryPath by string("")

@@ -1,5 +1,7 @@
 package io.github.hephbuild.heph.settings
 
+import com.intellij.openapi.components.RoamingType
+import com.intellij.openapi.components.State
 import com.intellij.util.xmlb.XmlSerializer
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
@@ -15,6 +17,13 @@ class HephSettingsTest {
         assertEquals("", settings.binaryPath)
         assertEquals("tool build-lsp", settings.serverArgs)
         assertEquals("", settings.extraFilePatterns)
+    }
+
+    @Test
+    fun storageDoesNotRoam() {
+        val storage = HephSettings::class.java.getAnnotation(State::class.java).storages.single()
+        assertEquals("heph.xml", storage.value)
+        assertEquals(RoamingType.DISABLED, storage.roamingType)
     }
 
     @Test

@@ -24,6 +24,9 @@ repositories {
 dependencies {
     intellijPlatform {
         intellijIdea("2026.3.0.1")
+        pluginModule(implementation(project(":shared")))
+        pluginModule(implementation(project(":frontend")))
+        pluginModule(implementation(project(":backend")))
         pluginVerifier()
         testFramework(TestFrameworkType.Platform)
     }

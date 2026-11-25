@@ -4,7 +4,7 @@ import com.intellij.openapi.fileTypes.LanguageFileType
 import io.github.hephbuild.heph.HephBundle
 import javax.swing.Icon
 
-/** No static name patterns: assigned by [io.github.hephbuild.heph.filetype.HephFileTypeOverrider]. */
+/** No static name patterns: assigned by `HephFileTypeOverrider` (backend module). */
 object HephFileType : LanguageFileType(HephLanguage) {
     override fun getName(): String = "Heph"
 

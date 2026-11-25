@@ -13,41 +13,10 @@
     ]]></description>
 
     <depends>com.intellij.modules.platform</depends>
-    <depends>com.intellij.modules.lsp</depends>
 
-    <resource-bundle>messages.HephBundle</resource-bundle>
-
-    <extensions defaultExtensionNs="com.intellij">
-        <fileType name="Heph"
-                  implementationClass="io.github.hephbuild.heph.lang.HephFileType"
-                  fieldName="INSTANCE"
-                  language="HephBuild"/>
-        <fileTypeOverrider implementation="io.github.hephbuild.heph.filetype.HephFileTypeOverrider"/>
-        <lang.parserDefinition language="HephBuild"
-                               implementationClass="io.github.hephbuild.heph.lang.parser.HephParserDefinition"/>
-        <lang.syntaxHighlighterFactory language="HephBuild"
-                                       implementationClass="io.github.hephbuild.heph.lang.highlight.HephSyntaxHighlighterFactory"/>
-        <colorSettingsPage implementation="io.github.hephbuild.heph.lang.highlight.HephColorSettingsPage"/>
-        <lang.commenter language="HephBuild" implementationClass="io.github.hephbuild.heph.lang.editor.HephCommenter"/>
-        <lang.braceMatcher language="HephBuild" implementationClass="io.github.hephbuild.heph.lang.editor.HephBraceMatcher"/>
-        <lang.quoteHandler language="HephBuild" implementationClass="io.github.hephbuild.heph.lang.editor.HephQuoteHandler"/>
-        <enterHandlerDelegate implementation="io.github.hephbuild.heph.lang.editor.HephEnterHandler" order="first"/>
-        <typedHandler implementation="io.github.hephbuild.heph.lang.editor.HephClosingBracketHandler"/>
-
-        <platform.lsp.integrationProvider
-                implementation="io.github.hephbuild.heph.lsp.HephLspIntegrationProvider"/>
-
-        <applicationConfigurable
-                parentId="language"
-                id="io.github.hephbuild.heph.settings"
-                instance="io.github.hephbuild.heph.settings.HephConfigurable"
-                displayName="Heph"/>
-
-        <notificationGroup id="Heph" displayType="BALLOON" key="notification.group.name"/>
-    </extensions>
-
-    <applicationListeners>
-        <listener class="io.github.hephbuild.heph.filetype.HephConfigFileListener"
-                  topic="com.intellij.openapi.vfs.newvfs.BulkFileListener"/>
-    </applicationListeners>
+    <content>
+        <module name="heph-jetbrains.shared" loading="required"/>
+        <module name="heph-jetbrains.frontend"/>
+        <module name="heph-jetbrains.backend"/>
+    </content>
 </idea-plugin>
