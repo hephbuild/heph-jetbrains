@@ -65,10 +65,11 @@ jobs:
         shell: devenv shell bash -- -e {0}
         run: ./gradlew buildPlugin -PpluginVersion="${{ steps.ver.outputs.version }}"
 
+      # Uploaded as is: zipping it would wrap the plugin zip in another zip, which the Marketplace rejects.
       - uses: actions/upload-artifact@v7
         with:
-          name: heph-plugin-${{ steps.ver.outputs.version }}
           path: build/distributions/*.zip
+          archive: false
 
       - name: Publish to Nightly channel
         if: github.ref == 'refs/heads/main' && vars.PUBLISH_NIGHTLY == 'true'
