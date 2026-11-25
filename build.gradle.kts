@@ -1,11 +1,12 @@
 import org.jetbrains.intellij.platform.gradle.IntelliJPlatformType
 import org.jetbrains.intellij.platform.gradle.TestFrameworkType
 import org.jetbrains.intellij.platform.gradle.tasks.aware.SplitModeAware
+import org.jetbrains.kotlin.gradle.dsl.KotlinJvmProjectExtension
 
 plugins {
     id("java")
     alias(libs.plugins.kotlin)
-    alias(libs.plugins.intelliJPlatform)
+    id("org.jetbrains.intellij.platform")
     alias(libs.plugins.kotlinSerialization) apply false
     alias(libs.plugins.rpc) apply false
 }
@@ -17,16 +18,22 @@ kotlin {
     jvmToolchain(25)
 }
 
-repositories {
-    mavenCentral()
-    intellijPlatform {
-        defaultRepositories()
+val intellijPlatformVersion = providers.gradleProperty("intellijPlatformVersion").get()
+
+subprojects {
+    apply(plugin = "org.jetbrains.kotlin.jvm")
+    apply(plugin = "org.jetbrains.intellij.platform.module")
+    apply(plugin = "rpc")
+    apply(plugin = "org.jetbrains.kotlin.plugin.serialization")
+
+    extensions.configure<KotlinJvmProjectExtension> {
+        jvmToolchain(25)
     }
 }
 
 dependencies {
     intellijPlatform {
-        intellijIdea("2026.3.0.1")
+        intellijIdea(intellijPlatformVersion)
         pluginModule(implementation(project(":shared")))
         pluginModule(implementation(project(":frontend")))
         pluginModule(implementation(project(":backend")))
@@ -57,8 +64,8 @@ intellijPlatform {
 
     pluginVerification {
         ides {
-            create(IntelliJPlatformType.IntellijIdea, "2026.3.0.1")
-            create(IntelliJPlatformType.GoLand, "2026.3.0.1")
+            create(IntelliJPlatformType.IntellijIdea, intellijPlatformVersion)
+            create(IntelliJPlatformType.GoLand, intellijPlatformVersion)
         }
     }
 }
@@ -71,7 +78,7 @@ val runIdeSplit by intellijPlatformTesting.runIde.registering {
 
 val runIdeSplitGoLand by intellijPlatformTesting.runIde.registering {
     type = IntelliJPlatformType.GoLand
-    version = "2026.3.0.1"
+    version = intellijPlatformVersion
     splitMode = true
     pluginInstallationTarget = SplitModeAware.PluginInstallationTarget.BOTH
 }

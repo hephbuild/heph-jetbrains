@@ -1,6 +1,5 @@
 [versions]
 kotlin = "2.4.0"
-intelliJPlatform = "2.20.1"
 junit = "4.13.2"
 opentest4j = "1.3.0"
 rpc = "2.4.0-RC-0.1"
@@ -14,6 +13,5 @@ kotlinx-serialization-json = { group = "org.jetbrains.kotlinx", name = "kotlinx-
 
 [plugins]
 kotlin = { id = "org.jetbrains.kotlin.jvm", version.ref = "kotlin" }
-intelliJPlatform = { id = "org.jetbrains.intellij.platform", version.ref = "intelliJPlatform" }
 kotlinSerialization = { id = "org.jetbrains.kotlin.plugin.serialization", version.ref = "kotlin" }
 rpc = { id = "rpc", version.ref = "rpc" }
