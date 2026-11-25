@@ -18,6 +18,12 @@ on:
 permissions:
   contents: read
 
+# Pull requests cancel superseded runs; runs on main finish so a publish is
+# never cut off.
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+
 jobs:
   build:
     name: Build and test
@@ -31,7 +37,7 @@ jobs:
         with:
           extra_nix_config: fallback = true
       - name: Install devenv.sh
-        run: nix profile add nixpkgs#devenv
+        run: nix profile add "github:cachix/devenv-nixpkgs/$(jq -r .nodes.nixpkgs.locked.rev devenv.lock)#devenv"
 
       - name: Compute version
         id: ver
@@ -42,7 +48,14 @@ jobs:
 
       - name: Test
         shell: devenv shell bash -- -e {0}
-        run: ./gradlew test
+        run: ./gradlew check
+
+      - name: Upload test reports
+        if: failure()
+        uses: actions/upload-artifact@v7
+        with:
+          name: test-reports
+          path: "**/build/reports/tests"
 
       - name: Build plugin
         shell: devenv shell bash -- -e {0}
