@@ -68,3 +68,10 @@ val runIdeSplit by intellijPlatformTesting.runIde.registering {
     splitMode = true
     pluginInstallationTarget = SplitModeAware.PluginInstallationTarget.BOTH
 }
+
+val runIdeSplitGoLand by intellijPlatformTesting.runIde.registering {
+    type = IntelliJPlatformType.GoLand
+    version = "2026.3.0.1"
+    splitMode = true
+    pluginInstallationTarget = SplitModeAware.PluginInstallationTarget.BOTH
+}

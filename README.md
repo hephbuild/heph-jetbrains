@@ -14,6 +14,11 @@ Settings | Languages & Frameworks | Heph
 Files matching these names inside a directory tree containing `.hephconfig` open as `Heph` and
 get the language server. Colours: Settings | Editor | Color Scheme | Heph.
 
+## Remote development
+
+Install the plugin on both the host and the client. The language server runs on the host, which
+resolves `heph` from the IDE process `PATH`; if it is not found, set the full path in the settings.
+
 ## Debugging
 
 Enable debug logging for `#com.intellij.platform.lsp` and `#io.github.hephbuild.heph`
@@ -26,6 +31,10 @@ Requires JDK 25, provided by `devenv shell`.
 ```
 ./gradlew test buildPlugin verifyPlugin
 ./gradlew runIde
+./gradlew runIdeSplit
 ```
+
+`runIdeSplit` and `runIdeSplitGoLand` start a local backend and JetBrains Client with the plugin in
+both, as in remote development.
 
 Source: https://github.com/hephbuild/heph-jetbrains
