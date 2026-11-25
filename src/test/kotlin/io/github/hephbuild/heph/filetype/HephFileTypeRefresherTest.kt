@@ -1,5 +1,6 @@
 package io.github.hephbuild.heph.filetype
 
+import com.intellij.testFramework.PlatformTestUtil
 import com.intellij.testFramework.fixtures.BasePlatformTestCase
 import com.intellij.util.ui.UIUtil
 import io.github.hephbuild.heph.lang.HephFileType
@@ -37,14 +38,12 @@ class HephFileTypeRefresherTest : BasePlatformTestCase() {
         HephFileTypeRefresher.afterRefresh = { calls.incrementAndGet() }
 
         val marker = fixture.createFile("late/.hephconfig")
-        UIUtil.dispatchAllInvocationEvents()
+        PlatformTestUtil.waitWithEventsDispatching("servers nudged after the marker appeared", { calls.get() > 0 }, 10)
         assertEquals(HephFileType, build.fileType)
-        assertTrue("servers nudged after the marker appeared", calls.get() > 0)
 
         val before = calls.get()
         com.intellij.openapi.application.runWriteAction { marker.delete(this) }
-        UIUtil.dispatchAllInvocationEvents()
+        PlatformTestUtil.waitWithEventsDispatching("servers nudged after the marker went", { calls.get() > before }, 10)
         assertTrue(build.fileType != HephFileType)
-        assertTrue("servers nudged after the marker went", calls.get() > before)
     }
 }
