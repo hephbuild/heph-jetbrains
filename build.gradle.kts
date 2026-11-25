@@ -71,12 +71,12 @@ intellijPlatform {
 }
 
 // Local split mode with the plugin installed in both backend and frontend.
-val runIdeSplit by intellijPlatformTesting.runIde.registering {
+intellijPlatformTesting.runIde.register("runIdeSplit") {
     splitMode = true
     pluginInstallationTarget = SplitModeAware.PluginInstallationTarget.BOTH
 }
 
-val runIdeSplitGoLand by intellijPlatformTesting.runIde.registering {
+intellijPlatformTesting.runIde.register("runIdeSplitGoLand") {
     type = IntelliJPlatformType.GoLand
     version = intellijPlatformVersion
     splitMode = true

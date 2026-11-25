@@ -19,6 +19,9 @@ get the language server. Colours: Settings | Editor | Color Scheme | Heph.
 Install the plugin on both the host and the client. The language server runs on the host, which
 resolves `heph` from the IDE process `PATH`; if it is not found, set the full path in the settings.
 
+File icon packs installed on the host (Catppuccin Icons, Atom Material Icons, ...) can leave the
+Heph file icon blank on the client, as their icons are not available there. Disable them if so.
+
 ## Debugging
 
 Enable debug logging for `#com.intellij.platform.lsp` and `#io.github.hephbuild.heph`
@@ -35,6 +38,6 @@ Requires JDK 25, provided by `devenv shell`.
 ```
 
 `runIdeSplit` and `runIdeSplitGoLand` start a local backend and JetBrains Client with the plugin in
-both, as in remote development.
+both, as in remote development. They listen on port 5990, so disconnect any Toolbox remote session first.
 
 Source: https://github.com/hephbuild/heph-jetbrains
