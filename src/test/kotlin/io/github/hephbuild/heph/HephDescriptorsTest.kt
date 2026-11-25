@@ -105,4 +105,17 @@ class HephDescriptorsTest {
         assertTrue("intellij.platform.frontend" in module("frontend").moduleDependencies())
         assertTrue("intellij.platform.backend" in module("backend").moduleDependencies())
     }
+
+    @Test
+    fun rpcIsDeclaredWhereItIsUsed() {
+        assertTrue("intellij.platform.rpc" in module("shared").moduleDependencies())
+        val backend = module("backend").moduleDependencies()
+        for (name in listOf("intellij.platform.rpc", "intellij.platform.rpc.backend", "intellij.platform.kernel.backend")) {
+            assertTrue(backend.toString(), name in backend)
+        }
+        for (entry in listOf("root" to root(), "shared" to module("shared"), "frontend" to module("frontend"))) {
+            assertFalse(entry.first, entry.second.text().contains("remoteApiProvider"))
+        }
+        assertTrue(module("backend").text().contains("platform.rpc.backend.remoteApiProvider"))
+    }
 }

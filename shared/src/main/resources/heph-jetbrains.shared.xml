@@ -1,4 +1,8 @@
 <idea-plugin>
+    <dependencies>
+        <module name="intellij.platform.rpc"/>
+    </dependencies>
+
     <resource-bundle>messages.HephBundle</resource-bundle>
 
     <extensions defaultExtensionNs="com.intellij">

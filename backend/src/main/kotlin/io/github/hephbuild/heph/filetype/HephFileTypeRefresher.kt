@@ -2,6 +2,7 @@ package io.github.hephbuild.heph.filetype
 
 import com.intellij.openapi.application.ApplicationManager
 import com.intellij.openapi.application.ModalityState
+import com.intellij.openapi.application.edtWriteAction
 import com.intellij.openapi.fileTypes.ex.FileTypeManagerEx
 import java.util.concurrent.atomic.AtomicBoolean
 
@@ -16,6 +17,11 @@ object HephFileTypeRefresher {
             pending.set(false)
             refreshNow()
         }, ModalityState.nonModal())
+    }
+
+    /** Suspends until the EDT write action ran; waits out modal dialogs. */
+    suspend fun refreshSuspending() {
+        edtWriteAction { FileTypeManagerEx.getInstanceEx().makeFileTypesChange("Heph file names changed") {} }
     }
 
     /** Must run on the EDT. */

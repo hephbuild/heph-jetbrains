@@ -1,10 +1,13 @@
 import org.jetbrains.intellij.platform.gradle.IntelliJPlatformType
 import org.jetbrains.intellij.platform.gradle.TestFrameworkType
+import org.jetbrains.intellij.platform.gradle.tasks.aware.SplitModeAware
 
 plugins {
     id("java")
     alias(libs.plugins.kotlin)
     alias(libs.plugins.intelliJPlatform)
+    alias(libs.plugins.kotlinSerialization) apply false
+    alias(libs.plugins.rpc) apply false
 }
 
 group = "io.github.hephbuild"
@@ -33,6 +36,7 @@ dependencies {
 
     testImplementation(libs.junit)
     testImplementation(libs.opentest4j)
+    testCompileOnly(libs.kotlinx.serialization.json)
 }
 
 intellijPlatform {
@@ -57,4 +61,10 @@ intellijPlatform {
             create(IntelliJPlatformType.GoLand, "2026.3.0.1")
         }
     }
+}
+
+// Local split mode with the plugin installed in both backend and frontend.
+val runIdeSplit by intellijPlatformTesting.runIde.registering {
+    splitMode = true
+    pluginInstallationTarget = SplitModeAware.PluginInstallationTarget.BOTH
 }

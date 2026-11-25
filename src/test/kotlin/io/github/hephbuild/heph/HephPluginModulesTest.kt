@@ -7,6 +7,7 @@ import com.intellij.lang.LanguageCommenters
 import com.intellij.lang.LanguageParserDefinitions
 import com.intellij.lang.LanguageQuoteHandling
 import com.intellij.notification.NotificationGroupManager
+import com.intellij.openapi.extensions.ExtensionPointName
 import com.intellij.openapi.fileTypes.FileTypeManager
 import com.intellij.openapi.fileTypes.SyntaxHighlighterFactory
 import com.intellij.openapi.fileTypes.impl.FileTypeOverrider
@@ -53,6 +54,11 @@ class HephPluginModulesTest : BasePlatformTestCase() {
     fun testSettingsPageRegistered() {
         val ids = Configurable.APPLICATION_CONFIGURABLE.extensionList.map { it.id }
         assertTrue(ids.toString(), "io.github.hephbuild.heph.settings" in ids)
+    }
+
+    fun testRemoteApiProviderRegistered() {
+        val providers = ExtensionPointName<Any>("com.intellij.platform.rpc.backend.remoteApiProvider").filterableLazySequence()
+        assertTrue(providers.any { it.implementationClassName == "io.github.hephbuild.heph.rpc.HephRemoteApiProvider" })
     }
 
     fun testNotificationGroupRegistered() {

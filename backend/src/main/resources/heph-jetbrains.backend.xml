@@ -1,6 +1,9 @@
 <idea-plugin>
     <dependencies>
         <module name="intellij.platform.backend"/>
+        <module name="intellij.platform.rpc"/>
+        <module name="intellij.platform.rpc.backend"/>
+        <module name="intellij.platform.kernel.backend"/>
         <module name="intellij.platform.lsp"/>
         <module name="intellij.platform.lsp.impl"/>
         <module name="heph-jetbrains.shared"/>
@@ -13,6 +16,9 @@
 
         <platform.lsp.integrationProvider
                 implementation="io.github.hephbuild.heph.lsp.HephLspIntegrationProvider"/>
+
+        <platform.rpc.backend.remoteApiProvider
+                implementation="io.github.hephbuild.heph.rpc.HephRemoteApiProvider"/>
 
         <applicationConfigurable
                 parentId="language"
