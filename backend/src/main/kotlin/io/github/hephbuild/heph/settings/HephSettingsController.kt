@@ -12,19 +12,8 @@ class HephSettingsController(
     private val resolver: HephBinaryResolver,
     private val afterSave: (patternsChanged: Boolean) -> Unit,
 ) {
-    /** Silent first-run seeding of the binary path; persists the seed. */
-    fun load(): HephSettingsPageDto {
-        val detection = resolver.resolve("")
-        val detected = (detection as? HephBinaryResult.Found)?.path?.toString()
-        val seeded = HephSettings.seedBinaryPath(settings.binaryPath, detected)
-        if (seeded != settings.binaryPath) settings.binaryPath = seeded
-        val searched = if (seeded.isBlank()) {
-            (detection as? HephBinaryResult.NotFound.AutoDetect)?.let(HephBinaryMessages::searched)
-        } else {
-            null
-        }
-        return HephSettingsPageDto(settings.toDto(), searched)
-    }
+    /** Read-only: a blank binary path stays blank, which keeps meaning auto-detect. */
+    fun load(): HephSettingsPageDto = page()
 
     /** Writes the fields as typed; the resolver trims and unquotes the path when it is used. */
     fun save(dto: HephSettingsDto): HephSettingsPageDto {
@@ -33,8 +22,18 @@ class HephSettingsController(
         settings.serverArgs = dto.serverArgs
         settings.extraFilePatterns = dto.extraFilePatterns
         afterSave(oldPatterns != dto.extraFilePatterns)
-        return HephSettingsPageDto(settings.toDto(), null)
+        return page()
     }
 
-    private fun HephSettings.toDto() = HephSettingsDto(binaryPath, serverArgs, extraFilePatterns)
+    /** The stored values plus, while the path is blank, the executable auto-detection resolves to. */
+    private fun page(): HephSettingsPageDto {
+        val stored = HephSettingsDto(settings.binaryPath, settings.serverArgs, settings.extraFilePatterns)
+        if (stored.binaryPath.isNotBlank()) return HephSettingsPageDto(stored)
+        return when (val detection = resolver.resolve("")) {
+            is HephBinaryResult.Found -> HephSettingsPageDto(stored, detected = detection.path.toString())
+            is HephBinaryResult.NotFound.AutoDetect ->
+                HephSettingsPageDto(stored, searched = HephBinaryMessages.searched(detection))
+            else -> HephSettingsPageDto(stored)
+        }
+    }
 }

@@ -28,5 +28,9 @@ class HephSettingsForm {
                 HephBundle.message("settings.binary.comment")
             }
         }
+
+        /** Grey text shown inside the empty field: the auto-detected executable. */
+        fun binaryPlaceholder(page: HephSettingsPageDto): String =
+            if (page.settings.binaryPath.isBlank()) page.detected.orEmpty() else ""
     }
 }

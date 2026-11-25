@@ -1,5 +1,6 @@
 package io.github.hephbuild.heph.lsp
 
+import io.github.hephbuild.heph.core.HephBinaryResolver
 import io.github.hephbuild.heph.notify.HephNotifier
 import io.github.hephbuild.heph.notify.drain
 import io.github.hephbuild.heph.settings.HephSettings
@@ -94,5 +95,75 @@ class HephLspIntegrationProviderTest : BasePlatformTestCase() {
         provider.isTrusted = { true }
         provider.fileOpened(project, build, starter)
         assertEquals(1, started)
+    }
+
+    fun testFoundBinaryIsLookedUpOncePerInterval() {
+        val fixture = myFixture.tempDirFixture
+        fixture.createFile("repo/.hephconfig")
+        val build = fixture.createFile("repo/BUILD")
+        fun executable() = java.nio.file.Files.createTempFile("heph", "").toFile().apply {
+            setExecutable(true)
+            deleteOnExit()
+        }
+        val first = executable()
+        val second = executable()
+        var lookups = 0
+        var clock = 0L
+        var path: String? = "/bin"
+        var started = 0
+        val starter = object : LspIntegrationProvider.LspClientStarter {
+            override fun ensureClientStarted(descriptor: LspClientDescriptor) {
+                started++
+            }
+        }
+        val provider = HephLspIntegrationProvider().apply {
+            resolver = HephBinaryResolver(isExecutable = { lookups++; java.nio.file.Files.isExecutable(it) })
+            nanoTime = { clock }
+            pathValue = { path }
+        }
+        val settings = HephSettings.getInstance()
+        settings.binaryPath = first.path
+
+        provider.fileOpened(project, build, starter)
+        provider.fileOpened(project, build, starter)
+        assertEquals("same setup within the interval", 1, lookups)
+
+        clock += java.util.concurrent.TimeUnit.SECONDS.toNanos(6)
+        provider.fileOpened(project, build, starter)
+        assertEquals("interval elapsed", 2, lookups)
+
+        settings.binaryPath = second.path
+        provider.fileOpened(project, build, starter)
+        assertEquals("configured path changed", 3, lookups)
+
+        path = "/usr/bin"
+        provider.fileOpened(project, build, starter)
+        assertEquals("PATH changed", 4, lookups)
+        assertEquals(5, started)
+    }
+
+    fun testFailedLookupIsNotCached() {
+        val fixture = myFixture.tempDirFixture
+        fixture.createFile("repo/.hephconfig")
+        val build = fixture.createFile("repo/BUILD")
+        val bin = java.nio.file.Files.createTempFile("heph", "").toFile().apply { deleteOnExit() }
+        var started = 0
+        val starter = object : LspIntegrationProvider.LspClientStarter {
+            override fun ensureClientStarted(descriptor: LspClientDescriptor) {
+                started++
+            }
+        }
+        val notifier = project.service<HephNotifier>()
+        notifier.reset()
+        notifier.drain()
+        HephSettings.getInstance().binaryPath = bin.path
+        val provider = HephLspIntegrationProvider()
+
+        provider.fileOpened(project, build, starter)
+        assertEquals("not executable yet", 0, started)
+
+        bin.setExecutable(true)
+        provider.fileOpened(project, build, starter)
+        assertEquals("fixed without waiting", 1, started)
     }
 }

@@ -35,4 +35,19 @@ class HephRootFinderTest : BasePlatformTestCase() {
         assertNull(HephRootFinder.find(dir))
         assertNull(HephBuildFiles.rootFor(build))
     }
+
+    fun testCachedResultsFollowMarkerChanges() {
+        val fixture = myFixture.tempDirFixture
+        val build = fixture.createFile("late/pkg/BUILD")
+        val dir = build.parent.parent
+        assertNull("no marker yet", HephRootFinder.find(build))
+        assertNull("still cached", HephRootFinder.find(build))
+
+        val marker = fixture.createFile("late/.hephconfig")
+        assertEquals("marker created", dir, HephRootFinder.find(build))
+        assertEquals("still cached", dir, HephRootFinder.find(build))
+
+        com.intellij.openapi.application.runWriteAction { marker.delete(this) }
+        assertNull("marker deleted", HephRootFinder.find(build))
+    }
 }

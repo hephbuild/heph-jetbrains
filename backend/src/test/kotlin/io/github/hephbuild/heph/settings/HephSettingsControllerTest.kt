@@ -19,22 +19,27 @@ class HephSettingsControllerTest {
         val controller = HephSettingsController(settings, resolver) { flags += it }
     }
 
-    private data class LoadCase(val stored: String, val found: Path?, val wantPath: String, val wantSearched: String?)
+    private data class LoadCase(val stored: String, val found: Path?, val want: HephSettingsPageDto)
 
     @Test
     fun load() {
+        fun dto(path: String) = HephSettingsDto(path, "tool build-lsp", "")
         val cases = mapOf(
-            "blank and detected seeds and persists" to LoadCase("", detected, detected.toString(), null),
-            "configured is kept" to LoadCase("/opt/heph", detected, "/opt/heph", null),
-            "blank and undetected reports searched" to LoadCase("", null, "", "PATH"),
-            "configured and undetected has no searched" to LoadCase("/opt/heph", null, "/opt/heph", null),
+            "blank and detected reports the path and stays blank" to
+                LoadCase("", detected, HephSettingsPageDto(dto(""), detected = detected.toString())),
+            "whitespace counts as blank" to
+                LoadCase("  ", detected, HephSettingsPageDto(dto("  "), detected = detected.toString())),
+            "configured is kept and not resolved" to LoadCase("/opt/heph", detected, HephSettingsPageDto(dto("/opt/heph"))),
+            "blank and undetected reports searched" to
+                LoadCase("", null, HephSettingsPageDto(dto(""), searched = "PATH")),
+            "configured and undetected has nothing extra" to
+                LoadCase("/opt/heph", null, HephSettingsPageDto(dto("/opt/heph"))),
         )
         for ((name, case) in cases) {
             val fixture = Fixture(case.stored, resolver(case.found))
-            val page = fixture.controller.load()
-            assertEquals(name, case.wantPath, page.settings.binaryPath)
-            assertEquals(name, case.wantPath, fixture.settings.binaryPath)
-            assertEquals(name, case.wantSearched, page.searched)
+            fixture.settings.serverArgs = "tool build-lsp"
+            assertEquals(name, case.want, fixture.controller.load())
+            assertEquals("$name: nothing is persisted", case.stored, fixture.settings.binaryPath)
             assertEquals(name, emptyList<Boolean>(), fixture.flags)
         }
     }
@@ -55,7 +60,7 @@ class HephSettingsControllerTest {
 
             val page = fixture.controller.save(dto)
 
-            assertEquals(name, HephSettingsPageDto(dto, null), page)
+            assertEquals(name, HephSettingsPageDto(dto), page)
             assertEquals(name, dto.binaryPath, fixture.settings.binaryPath)
             assertEquals(name, dto.serverArgs, fixture.settings.serverArgs)
             assertEquals(name, dto.extraFilePatterns, fixture.settings.extraFilePatterns)
@@ -64,11 +69,12 @@ class HephSettingsControllerTest {
     }
 
     @Test
-    fun blankSaveDoesNotSeed() {
+    fun blankSaveStaysBlankAndReportsDetection() {
         val fixture = Fixture("/opt/heph", resolver(detected))
         val page = fixture.controller.save(HephSettingsDto("", "tool build-lsp", ""))
         assertEquals("", page.settings.binaryPath)
         assertEquals("", fixture.settings.binaryPath)
+        assertEquals(detected.toString(), page.detected)
         assertEquals(null, page.searched)
     }
 }

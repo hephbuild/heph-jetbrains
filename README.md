@@ -6,7 +6,8 @@
 
 Settings | Languages & Frameworks | Heph
 
-- **Heph executable**: prefilled with the detected location. Change it to use another binary.
+- **Heph executable**: empty means auto-detect, and the page shows the detected location. Set a path to use
+  another binary.
 - **Server arguments**: defaults to `tool build-lsp`.
 - **Additional file names**: names or globs, separated by semicolons, for build files other than
   `BUILD`, `BUILD.*` and `*.BUILD`.
@@ -17,7 +18,8 @@ get the language server. Colours: Settings | Editor | Color Scheme | Heph.
 ## Remote development
 
 Install the plugin on both the host and the client. The language server runs on the host, which
-resolves `heph` from the IDE process `PATH`; if it is not found, set the full path in the settings.
+resolves `heph` from the `PATH` of its login shell environment; if it is not found, set the full path
+in the settings.
 
 The Heph file icon is ordered ahead of Catppuccin Icons. Other icon packs installed on the host
 (Atom Material Icons, ...) can leave it blank on the client, as their icons are not available

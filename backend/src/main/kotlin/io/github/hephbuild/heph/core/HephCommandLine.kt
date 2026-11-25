@@ -10,7 +10,7 @@ object HephCommandLine {
 
     fun build(binary: Path, args: String, root: Path): GeneralCommandLine =
         GeneralCommandLine(binary.toString())
-            .withParameters(ParametersListUtil.parse(args, false, true))
+            .withParameters(ParametersListUtil.parse(args.ifBlank { DEFAULT_ARGS }, false, true))
             .withWorkDirectory(root.toFile())
             .withParentEnvironmentType(GeneralCommandLine.ParentEnvironmentType.CONSOLE)
             .withCharset(StandardCharsets.UTF_8)

@@ -18,7 +18,7 @@ class HephSettingsApiTest : BasePlatformTestCase() {
             assertEquals(settings.binaryPath, page.settings.binaryPath)
             assertEquals("tool build-lsp --debug", page.settings.serverArgs)
             assertEquals("BUILD2", page.settings.extraFilePatterns)
-            assertEquals(page.settings.binaryPath.isBlank(), page.searched != null)
+            assertEquals(page.settings.binaryPath.isBlank(), page.detected != null || page.searched != null)
         } finally {
             settings.loadState(before)
         }

@@ -69,19 +69,4 @@ class HephSettingsTest {
         settings.extraFilePatterns = ""
         assertFalse(settings.fileMatcher.matches("BUILD2"))
     }
-
-    @Test
-    fun seedBinaryPath() {
-        val cases = mapOf(
-            "blank current, detected" to (("" to "/usr/local/bin/heph") to "/usr/local/bin/heph"),
-            "whitespace current, detected" to (("  " to "/usr/local/bin/heph") to "/usr/local/bin/heph"),
-            "blank current, nothing detected" to (("" to null) to ""),
-            "whitespace current, nothing detected" to (("  " to null) to "  "),
-            "set current, detected" to (("/opt/heph" to "/usr/local/bin/heph") to "/opt/heph"),
-            "set current, nothing detected" to (("/opt/heph" to null) to "/opt/heph"),
-        )
-        for ((name, case) in cases) {
-            assertEquals(name, case.second, HephSettings.seedBinaryPath(case.first.first, case.first.second))
-        }
-    }
 }

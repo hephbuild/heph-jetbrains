@@ -17,6 +17,7 @@ import com.intellij.platform.ide.progress.TaskCancellation
 import com.intellij.platform.ide.progress.runWithModalProgressBlocking
 import com.intellij.platform.util.coroutines.childScope
 import com.intellij.ui.JBColor
+import com.intellij.ui.components.JBTextField
 import com.intellij.ui.dsl.builder.AlignX
 import com.intellij.ui.dsl.builder.Cell
 import com.intellij.ui.dsl.builder.bindText
@@ -108,6 +109,7 @@ class HephConfigurable : BoundConfigurable(HephBundle.message("settings.title"))
         form.set(page.settings)
         super.reset()
         binaryCell?.comment?.text = HephSettingsForm.binaryComment(page)
+        (binaryCell?.component?.textField as? JBTextField)?.emptyText?.setText(HephSettingsForm.binaryPlaceholder(page))
     }
 
     override fun isModified(): Boolean = loaded.get() && super.isModified()

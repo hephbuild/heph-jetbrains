@@ -33,7 +33,7 @@ class HephLspClientDescriptor(
         }
 
         override fun serverStopped(shutdownNormally: Boolean) {
-            if (!shutdownNormally) {
+            if (!shutdownNormally && !project.isDisposed) {
                 project.service<HephNotifier>().serverCrashed()
             }
         }

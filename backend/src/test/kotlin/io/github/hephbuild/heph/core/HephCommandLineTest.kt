@@ -15,7 +15,8 @@ class HephCommandLineTest {
             "default" to ("tool build-lsp" to listOf("tool", "build-lsp")),
             "quoted" to ("tool \"build lsp\" --x='a b'" to listOf("tool", "build lsp", "--x=a b")),
             "single quotes" to ("--x='a b' c" to listOf("--x=a b", "c")),
-            "empty" to ("" to emptyList()),
+            "empty falls back to the default" to ("" to listOf("tool", "build-lsp")),
+            "blank falls back to the default" to ("  " to listOf("tool", "build-lsp")),
         )
         for ((name, case) in cases) {
             assertEquals(name, case.second, HephCommandLine.build(bin, case.first, root).parametersList.list)

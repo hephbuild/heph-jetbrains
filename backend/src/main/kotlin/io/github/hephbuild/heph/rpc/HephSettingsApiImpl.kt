@@ -14,5 +14,6 @@ class HephSettingsApiImpl : HephSettingsApi {
 
     override suspend fun load(): HephSettingsPageDto = withContext(Dispatchers.IO) { controller.load() }
 
-    override suspend fun save(settings: HephSettingsDto): HephSettingsPageDto = controller.save(settings)
+    override suspend fun save(settings: HephSettingsDto): HephSettingsPageDto =
+        withContext(Dispatchers.IO) { controller.save(settings) }
 }

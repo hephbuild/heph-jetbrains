@@ -16,6 +16,7 @@ import io.github.hephbuild.heph.rpc.HephNotificationDto
 import io.github.hephbuild.heph.rpc.HephNotificationsApi
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import java.util.concurrent.atomic.AtomicBoolean
 
@@ -24,18 +25,27 @@ import java.util.concurrent.atomic.AtomicBoolean
 class HephFrontendNotifier(private val project: Project, private val scope: CoroutineScope) {
     private val subscribed = AtomicBoolean()
 
-    /** Idempotent; collects until the project closes. */
+    /** Idempotent; collects until the project closes, resubscribing with a growing delay when the stream fails or ends. */
     fun subscribe() {
         if (!subscribed.compareAndSet(false, true)) return
         scope.launch {
-            try {
-                durable {
-                    HephNotificationsApi.getInstance().notifications(project.projectId()).collect { show(it) }
+            var backoff = INITIAL_BACKOFF_MS
+            while (true) {
+                try {
+                    durable {
+                        HephNotificationsApi.getInstance().notifications(project.projectId()).collect {
+                            backoff = INITIAL_BACKOFF_MS
+                            show(it)
+                        }
+                    }
+                    LOG.info("Heph notification stream ended; resubscribing")
+                } catch (e: CancellationException) {
+                    throw e
+                } catch (e: Exception) {
+                    LOG.warn("Heph notification subscription failed; retrying in ${backoff}ms", e)
                 }
-            } catch (e: CancellationException) {
-                throw e
-            } catch (e: Exception) {
-                LOG.warn("Heph notification subscription failed", e)
+                delay(backoff)
+                backoff = minOf(backoff * 2, MAX_BACKOFF_MS)
             }
         }
     }
@@ -72,6 +82,8 @@ class HephFrontendNotifier(private val project: Project, private val scope: Coro
 
     companion object {
         const val GROUP_ID = "Heph"
+        private const val INITIAL_BACKOFF_MS = 1_000L
+        private const val MAX_BACKOFF_MS = 60_000L
         private val LOG = logger<HephFrontendNotifier>()
     }
 }
